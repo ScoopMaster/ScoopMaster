@@ -11,7 +11,7 @@
 
 
 ## GET List of Buckets from Scoop-Directory website
-$scoopDBURL = "https://joaquinito2070.github.io/scoop-directory/by-apps.html"
+$scoopDBURL = "https://rasa.github.io/scoop-directory/by-apps.html"
 $ErrorActionPreference = 'SilentlyContinue'
 $lBuckets = [System.Collections.ArrayList]@()
 $source = iwr $scoopDBURL
