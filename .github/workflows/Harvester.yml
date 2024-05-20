@@ -116,7 +116,7 @@ jobs:
             if( -not ($_ -match 'https:\/\/github.com\/(.+)')){
               $_ >> ERROR_badrepos.txt
               return}
-            if(($_ -match 'ScoopMaster\/ScoopMaster' & $_ -match 'okibcn\/ScoopMaster' & $_ -match 'zeero\/scoop-my-bucket')){
+            if(($_ -match 'ScoopMaster\/ScoopMaster' | $_ -match 'okibcn\/ScoopMaster' | $_ -match 'zeero\/scoop-my-bucket')){
               return}
             $owner_repo=$matches[1].replace('/','~')
             return "$_/archive/refs/heads/master.zip`n    out=$owner_repo.zip"
