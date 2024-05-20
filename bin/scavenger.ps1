@@ -24,7 +24,7 @@ $lBuckets >> Bucket_list.txt
 
 ## CREATE ZIP LIST for aria2c
 $lZips=$lBuckets | %{
-    if( -not ($_ -match 'https:\/\/github.com\/(.+)')){
+    if( -not ($_ -match 'https:\/\/github.com\/(.+)') -or $_ -match 'https:\/\/github.com\/zeero\/scoop-my-bucket'){
         $_ >> badrepos.txt
         return}
     $owner_repo=$matches[1].replace('/','~')
