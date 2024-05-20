@@ -58,7 +58,27 @@ jobs:
     - name: "🔍 Discover known buckets from Scoop-Directory website."
       run: |
         cd ..
-        $scoopDBURL = "https://joaquinito2070.github.io/scoop-directory/by-apps.html"
+        $lOfficial = (curl -s -X POST 'https://scoopsearch.search.windows.net/indexes/apps/docs/search?api-version=2020-06-30' `
+            -H 'Content-Type: application/json' `
+            -H 'api-key: DC6D2BBE65FC7313F2C52BBD2B0286ED' `
+            -d '
+            {
+              \"facets\":[\"Metadata/Repository,count:10000\"],
+              \"filter\":\"Metadata/OfficialRepositoryNumber eq 1\",
+              \"top\":0
+            }' | jq . | sls 'http.*github[^"]+').Matches.Value
+        Write-Host "$($lOfficial.count) Official buckets found in Scoop.sh"
+        $lCommunity = (curl -s -X POST 'https://scoopsearch.search.windows.net/indexes/apps/docs/search?api-version=2020-06-30' `
+            -H 'Content-Type: application/json' `
+            -H 'api-key: DC6D2BBE65FC7313F2C52BBD2B0286ED' `
+            -d '
+            {
+              \"facets\":[\"Metadata/Repository,count:10000\"],
+              \"filter\":\"Metadata/OfficialRepositoryNumber eq 0\",
+              \"top\":0
+            }' | jq . | sls 'http.*github[^"]+').Matches.Value
+        Write-Host "$($lCommunity.count) Community buckets found in Scoop.sh"
+        $scoopDBURL = "https://rasa.github.io/scoop-directory/by-apps.html"
         $ErrorActionPreference = 'SilentlyContinue'
         $lScoopdir = @()
         $source = iwr $scoopDBURL
@@ -69,7 +89,7 @@ jobs:
         }
         Write-Host "$($lScoopdir.count) buckets found in Scoop-Directory."
 
-        $lActive = ($lScoopdir) | Sort-Object | Get-Unique
+        $lActive = ($lOfficial+$lCommunity+$lScoopdir) | Sort-Object | Get-Unique
         Write-Host "$($lActive.count) total Active buckets found so far"
 
         $oldActive=gc ScoopMaster/ActiveBuckets
@@ -96,7 +116,7 @@ jobs:
             if( -not ($_ -match 'https:\/\/github.com\/(.+)')){
               $_ >> ERROR_badrepos.txt
               return}
-            if(($_ -match 'okibcn\/ScoopMaster')){
+            if(($_ -match 'ScoopMaster\/ScoopMaster' & $_ -match 'okibcn\/ScoopMaster' & $_ -match 'zeero\/scoop-my-bucket')){
               return}
             $owner_repo=$matches[1].replace('/','~')
             return "$_/archive/refs/heads/master.zip`n    out=$owner_repo.zip"
@@ -465,4 +485,3 @@ jobs:
         name: Logs
         path: |
           *.txt
-
