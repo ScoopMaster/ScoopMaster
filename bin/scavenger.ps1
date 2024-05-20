@@ -10,13 +10,13 @@
 # remove-item 7zr*,*x64.exe,7zdir -Recurse -Force
 
 
-## GET List of Buckets from ScoopSearch API Server
-$scoopDBURL = "https://scoopsearch.search.windows.net/indexes/apps/docs/search?api-version=2020-06-30"
+## GET List of Buckets from Scoop-Directory website
+$scoopDBURL = "https://joaquinito2070.github.io/scoop-directory/by-apps.html"
 $ErrorActionPreference = 'SilentlyContinue'
 $lBuckets = [System.Collections.ArrayList]@()
 $source = iwr $scoopDBURL
 $source.Content -split '\r?\n' | ForEach-Object -Process {
-    if ($_ -match 'value: "*(http[^\"]+)"'){
+    if ($_ -match '<h2.*(http[^\"]+)"'){
         [void]$lBuckets.Add($matches[1])
     }
 }
@@ -24,7 +24,7 @@ $lBuckets >> Bucket_list.txt
 
 ## CREATE ZIP LIST for aria2c
 $lZips=$lBuckets | %{
-    if( -not ($_ -match 'https:\/\/github.com\/(.+)') -or $_ -match 'https:\/\/github.com\/zeero\/scoop-my-bucket'){
+    if( -not ($_ -match 'https:\/\/github.com\/(.+)')){
         $_ >> badrepos.txt
         return}
     $owner_repo=$matches[1].replace('/','~')
