@@ -10,13 +10,13 @@
 # remove-item 7zr*,*x64.exe,7zdir -Recurse -Force
 
 
-## GET List of Buckets from Scoop-Directory website
-$scoopDBURL = "https://rasa.github.io/scoop-directory/by-apps.html"
+## GET List of Buckets from ScoopSearch API Server
+$scoopDBURL = "https://scoopsearch.search.windows.net/indexes/apps/docs/search?api-version=2020-06-30"
 $ErrorActionPreference = 'SilentlyContinue'
 $lBuckets = [System.Collections.ArrayList]@()
 $source = iwr $scoopDBURL
 $source.Content -split '\r?\n' | ForEach-Object -Process {
-    if ($_ -match '<h2.*(http[^\"]+)"'){
+    if ($_ -match 'value: "*(http[^\"]+)"'){
         [void]$lBuckets.Add($matches[1])
     }
 }
